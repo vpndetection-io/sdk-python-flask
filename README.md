@@ -1,4 +1,4 @@
-# [<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" width="24"/>](https://vpndetection.io/) VPNDetection Flask Extension
+# [<img src="https://s3.vpndetection.io/vpndetection-public/brand/mark.svg" alt="VPNDetection" height="28"/>](https://vpndetection.io/) VPNDetection Flask Extension
 
 [![PyPI](https://img.shields.io/pypi/v/vpndetection-flask.svg)](https://pypi.org/project/vpndetection-flask/)
 [![license](https://img.shields.io/pypi/l/vpndetection-flask.svg)](LICENSE)
