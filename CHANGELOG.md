@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.0.6 - 2026-09-27
+
+### Features
+
+- Require vpndetection 5.5.0: OauthMetadata carries client_id_metadata_document_supported ([`4d6b906`](https://github.com/vpndetection-io/sdk-python-flask/commit/4d6b906b30b98635d4e79c650ade22543d55799e))
+
 ## 2.0.5 - 2026-09-25
 
 ### Fixes
