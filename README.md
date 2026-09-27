@@ -69,7 +69,7 @@ By default the extension uses `request.remote_addr`, which is the socket peer un
 For an edge that writes the address into its own header, name the header:
 
 ```python
-from python_flask import header_ip_selector
+from vpndetection_flask import header_ip_selector
 
 ip_selector = header_ip_selector("CF-Connecting-IP")  # or True-Client-IP, or your own
 ```
