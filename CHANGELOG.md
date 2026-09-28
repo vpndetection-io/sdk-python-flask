@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.0.7 - 2026-09-28
+
+### Fixes
+
+- Require vpndetection 5.5.1: IPv4-mapped visitors are looked up, not waved through ([`a946afc`](https://github.com/vpndetection-io/sdk-python-flask/commit/a946afc6955f6261da401c03c6d418d2f678d065))
+
 ## 2.0.6 - 2026-09-27
 
 ### Features
