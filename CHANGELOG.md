@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.0.8 - 2026-09-29
+
+### Fixes
+
+- Require vpndetection 5.5.2: 26 more reserved ranges are answered locally ([`64c2a46`](https://github.com/vpndetection-io/sdk-python-flask/commit/64c2a461290a6a9bed3db6be17a51df93950fcfb))
+
 ## 2.0.7 - 2026-09-28
 
 ### Fixes
