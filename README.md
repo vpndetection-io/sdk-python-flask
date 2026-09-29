@@ -64,7 +64,7 @@ Replace the refusal with `on_blocked`.
 
 This is the setting that decides whether any of the above works, and it is the one thing only you can get right.
 
-By default the extension uses `request.remote_addr`, which is the socket peer unless you have wrapped the app in werkzeug's `ProxyFix`. Behind a load balancer without it, every visitor looks like the load balancer — a datacenter address, so a hosting rule would block all of them. Adding `ProxyFix` is Flask's own answer and everything else here follows from it.
+By default the extension uses `request.remote_addr`, which is the socket peer unless you have wrapped the app in werkzeug's `ProxyFix`. Behind a load balancer without it, every visitor looks like the load balancer — a datacenter address, so a hosting rule would block all of them. Adding `ProxyFix` is Flask's own answer and everything else here follows from it. It counts proxies from the right (`x_for=1` believes the last `X-Forwarded-For` entry), so it is right only when the app cannot be reached except through those proxies: anyone who connects to the app directly writes that entry themselves.
 
 For an edge that writes the address into its own header, name the header:
 
