@@ -7,17 +7,21 @@ a public address, through a selector.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import pathlib
 from typing import Any
 
 import httpx
 import pytest
-from flask import Flask, jsonify
+from flask import Flask, g, jsonify
 from vpndetection import VPNDetection as Client
+from vpndetection.middleware import Lookup
+from vpndetection.models import to_result
 
 from vpndetection_flask import (
     VPNDetection,
+    block_if,
     default_ip_selector,
     header_ip_selector,
     lookup,
@@ -45,28 +49,34 @@ def serving(body: dict[str, Any], *, status: int = 200) -> Client:
     return client
 
 
-def app_with(**options: Any) -> Flask:
+def describe() -> Any:
+    found = lookup()
+    return jsonify(
+        {
+            "ip": found.ip if found else None,
+            "is_vpn": found.result.is_vpn if found and found.result else None,
+            "is_bogon": found.result.is_bogon if found and found.result else None,
+            "error": type(found.error).__name__ if found and found.error else None,
+            "attached": found is not None,
+        }
+    )
+
+
+def app_with(*, guard: dict[str, Any] | None = None, **options: Any) -> Flask:
+    """An app with the extension, whose ``/guarded`` view carries ``block_if(**guard)``."""
     app = Flask(__name__)
     VPNDetection(app, **options)
-
-    @app.route("/")
-    def index() -> Any:
-        found = lookup()
-        return jsonify(
-            {
-                "ip": found.ip if found else None,
-                "is_vpn": found.result.is_vpn if found and found.result else None,
-                "is_bogon": found.result.is_bogon if found and found.result else None,
-                "error": type(found.error).__name__ if found and found.error else None,
-                "attached": found is not None,
-            }
-        )
-
+    app.route("/", endpoint="index")(describe)
+    app.route("/guarded", endpoint="guarded")(
+        block_if(**(guard or {"condition": {"is_vpn": True}}))(describe)
+    )
     return app
 
 
-def get(app: Flask, headers: dict[str, str] | None = None) -> tuple[int, dict[str, Any]]:
-    response = app.test_client().get("/", headers=headers or {})
+def get(
+    app: Flask, headers: dict[str, str] | None = None, url: str = "/"
+) -> tuple[int, dict[str, Any]]:
+    response = app.test_client().get(url, headers=headers or {})
     return response.status_code, response.get_json()
 
 
@@ -218,6 +228,131 @@ def test_corpus_conditions(case: dict[str, Any]) -> None:
             on_warn=warnings.append,
         )
     )
+    assert status == (403 if case["expect"]["blocked"] else 200), case["why"]
+    reported = [w for w in warnings if "does not include" in w]
+    assert len(reported) == (1 if case["expect"]["missing"] else 0), case["why"]
+    for member in case["expect"]["missing"]:
+        assert member in reported[0], case["why"]
+
+
+def test_block_if_refuses_only_the_view_it_decorates() -> None:
+    vpn = serving({"is_vpn": True, "vpn": {"provider": "nordvpn"}})
+    app = app_with(client=vpn, ip_selector=fixed_ip)
+    status, body = get(app, url="/guarded")
+    assert status == 403
+    assert body == {"error": "access denied"}
+    status, body = get(app)
+    assert status == 200, "the extension itself has no condition, so other views are open"
+    assert body["is_vpn"] is True
+    assert vpn.asked == [PUBLIC_IP, PUBLIC_IP], "one lookup per request, none by the decorator"
+
+    clean = serving({"is_vpn": False, "vpn": {}})
+    status, body = get(app_with(client=clean, ip_selector=fixed_ip), url="/guarded")
+    assert status == 200
+    assert body["attached"] is True
+
+
+def test_block_if_on_blocked_replaces_the_refusal() -> None:
+    vpn = serving({"is_vpn": True, "vpn": {"provider": "nordvpn"}})
+
+    def refuse(found: Any) -> Any:
+        return jsonify({"why": found.result.vpn.provider}), 451
+
+    app = app_with(
+        client=vpn,
+        ip_selector=fixed_ip,
+        guard={"condition": {"is_vpn": True}, "on_blocked": refuse},
+    )
+    status, body = get(app, url="/guarded")
+    assert status == 451
+    assert body == {"why": "nordvpn"}
+
+
+def test_block_if_lets_a_skipped_request_through() -> None:
+    vpn = serving({"is_vpn": True})
+    app = app_with(client=vpn, ip_selector=fixed_ip, skip=lambda request: True)
+    status, body = get(app, url="/guarded")
+    assert status == 200
+    assert body["attached"] is False
+    assert vpn.asked == []
+
+
+def test_block_if_fails_open_unless_told_to_fail_closed() -> None:
+    failing = serving({"error": "boom"}, status=500)
+    status, body = get(app_with(client=failing, ip_selector=fixed_ip), url="/guarded")
+    assert status == 200
+    assert body["error"] == "VPNDetectionError"
+
+    closed = app_with(
+        client=failing,
+        ip_selector=fixed_ip,
+        guard={"condition": {"is_vpn": True}, "fail_closed": True},
+    )
+    status, body = get(closed, url="/guarded")
+    assert status == 403
+    assert body == {"error": "access denied"}
+
+
+def test_block_if_without_the_extension_is_an_error() -> None:
+    app = Flask(__name__)
+    app.testing = True
+    app.route("/guarded")(block_if({"is_vpn": True})(describe))
+    with pytest.raises(RuntimeError, match="register the VPNDetection extension"):
+        app.test_client().get("/guarded")
+
+
+def test_block_if_refuses_a_condition_that_constrains_nothing() -> None:
+    with pytest.raises(ValueError, match="constrains nothing"):
+        block_if({"is_vpn": False})(describe)
+
+
+def test_block_if_warns_once_naming_the_view() -> None:
+    free = serving({"is_vpn": True})
+    warnings: list[str] = []
+    app = app_with(
+        client=free,
+        ip_selector=fixed_ip,
+        guard={"condition": {"is_hosting": True}, "on_warn": warnings.append},
+    )
+    get(app, url="/guarded")
+    get(app, url="/guarded")
+    assert len(warnings) == 1
+    assert warnings[0].startswith("block_if on describe names is_hosting")
+
+
+# Flask runs an async view only with its async extra installed, so the wrapper is driven
+# directly here, inside a request the extension has already classified.
+def test_block_if_guards_an_async_view() -> None:
+    async def checkout() -> str:
+        return "served"
+
+    guarded = block_if({"is_vpn": True})(checkout)
+    assert asyncio.iscoroutinefunction(guarded)
+    app = app_with()
+    for is_vpn, expected in ((True, 403), (False, 200)):
+        with app.test_request_context("/"):
+            g.vpndetection = Lookup(
+                blocked=False,
+                ip=PUBLIC_IP,
+                result=to_result({"ip": PUBLIC_IP, "is_vpn": is_vpn}),
+            )
+            answer = asyncio.run(guarded())
+            status = answer.status_code if expected == 403 else 200
+            assert status == expected
+            assert (answer == "served") is (expected == 200)
+
+
+@pytest.mark.parametrize("case", MIDDLEWARE["conditions"], ids=lambda c: c["name"])
+def test_corpus_conditions_through_block_if(case: dict[str, Any]) -> None:
+    ip = case.get("bogon") or case["body"]["ip"]
+    client = serving({k: v for k, v in (case.get("body") or {}).items() if k != "ip"})
+    warnings: list[str] = []
+    app = app_with(
+        client=client,
+        ip_selector=lambda _request, ip=ip: ip,
+        guard={"condition": case["condition"], "on_warn": warnings.append},
+    )
+    status, _ = get(app, url="/guarded")
     assert status == (403 if case["expect"]["blocked"] else 200), case["why"]
     reported = [w for w in warnings if "does not include" in w]
     assert len(reported) == (1 if case["expect"]["missing"] else 0), case["why"]

@@ -1,7 +1,8 @@
 """Official Flask extension for the VPNDetection API.
 
 Classifies the visitor behind each request and hangs the answer off ``g.vpndetection``,
-where your views can read it. Blocking is opt-in.
+where your views can read it. Blocking is opt-in, for every view or for one with
+:func:`block_if`.
 
     from flask import Flask
     from vpndetection_flask import VPNDetection
@@ -16,13 +17,18 @@ the parts that are genuinely Flask-shaped.
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from functools import wraps
+from inspect import iscoroutinefunction
+from typing import Any, TypeVar
 
-from flask import Flask, Response, g, jsonify, request
+from flask import Flask, Response, current_app, g, jsonify, request
 from vpndetection.middleware import (
+    Conditions,
     Core,
+    Guard,
     IpSelector,
     Lookup,
+    MissingFieldAction,
     Options,
     RequestView,
     Selectors,
@@ -32,6 +38,7 @@ from werkzeug.wrappers import Request as WerkzeugRequest
 
 __all__ = [
     "VPNDetection",
+    "block_if",
     "default_ip_selector",
     "header_ip_selector",
     "lookup",
@@ -39,6 +46,8 @@ __all__ = [
 ]
 
 __version__ = "2.0.9"
+
+View = TypeVar("View", bound=Callable[..., Any])
 
 _SELECTORS: Selectors[WerkzeugRequest] = bind_selectors(
     lambda req: RequestView(
@@ -75,6 +84,78 @@ def lookup() -> Lookup | None:
     None when the extension has not run for this request, or when ``skip`` claimed it.
     """
     return getattr(g, "vpndetection", None)
+
+
+def block_if(
+    condition: Conditions,
+    *,
+    on_blocked: Callable[[Lookup], Response] | None = None,
+    fail_closed: bool = False,
+    on_missing_field: MissingFieldAction = "warn",
+    on_warn: Callable[[str], None] | None = None,
+) -> Callable[[View], View]:
+    """Refuse one view to a visitor matching ``condition``.
+
+    The extension's ``block_condition`` refuses on every view; this refuses on the view
+    it decorates, sync or async. Put it below the route::
+
+        @app.get("/checkout")
+        @block_if({"is_vpn": True})
+        def checkout(): ...
+
+    It judges the answer the extension already attached, so the visitor is not looked up
+    again, and a member your plan does not serve is reported once, as the extension's
+    own condition reports it. A condition that constrains nothing is refused when the
+    decorator is applied.
+
+    A request ``skip`` claimed carries no answer and reaches the view, and so does one
+    whose lookup failed unless you set ``fail_closed``. On an app the extension is not
+    registered on, it raises ``RuntimeError``: a check that silently never ran would be
+    worse than none.
+    """
+    refuse = on_blocked or _refuse
+
+    def decorate(view: View) -> View:
+        guard = Guard(
+            condition,
+            fail_closed=fail_closed,
+            on_missing_field=on_missing_field,
+            on_warn=on_warn,
+            name=f"block_if on {getattr(view, '__qualname__', view)}",
+        )
+
+        def refusal() -> Response | None:
+            found = lookup()
+            if found is None:
+                if "vpndetection" in current_app.extensions:
+                    return None
+                raise RuntimeError(
+                    "vpndetection: block_if found no answer on this request; register the "
+                    "VPNDetection extension on the app"
+                )
+            return refuse(found) if guard.blocks(found) else None
+
+        if iscoroutinefunction(view):
+
+            @wraps(view)
+            async def guarded_async(*args: Any, **kwargs: Any) -> Any:
+                refused = refusal()
+                if refused is not None:
+                    return refused
+                return await view(*args, **kwargs)
+
+            return guarded_async  # type: ignore[return-value]
+
+        @wraps(view)
+        def guarded(*args: Any, **kwargs: Any) -> Any:
+            refused = refusal()
+            if refused is not None:
+                return refused
+            return view(*args, **kwargs)
+
+        return guarded  # type: ignore[return-value]
+
+    return decorate
 
 
 class VPNDetection:
