@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.0 - 2026-10-03
+
+### Features
+
+- Add block_if, a decorator refusing one view to a visitor matching a condition ([`a376d74`](https://github.com/vpndetection-io/sdk-python-flask/commit/a376d74867e3e8f6b785dd67bda86507554b033d))
+
 ## 2.0.9 - 2026-10-02
 
 ### Fixes
