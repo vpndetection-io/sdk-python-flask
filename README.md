@@ -69,10 +69,10 @@ Replace the refusal with `on_blocked`.
 ```python
 from vpndetection_flask import block_if
 
+
 @app.get("/checkout")
 @block_if({"is_vpn": True})
-def checkout():
-    ...
+def checkout(): ...
 ```
 
 `block_if` takes the same condition, `on_blocked`, `fail_closed` and `on_missing_field`. It judges the answer the extension already attached, so a visitor is looked up once however many views check them, and it warns once for a member your plan doesn't include. A request `skip` claimed reaches the view. The extension still has to be registered: on an app without it, a decorated view raises `RuntimeError` instead of letting everyone through.
