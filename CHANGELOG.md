@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.2 - 2026-10-06
+
+### Features
+
+- Require vpndetection 5.7.0: the authorization code sign-in ([`84075cc`](https://github.com/vpndetection-io/sdk-python-flask/commit/84075ccacb9acca92fe38a0d843c655b6f087ba4))
+
 ## 2.1.1 - 2026-10-04
 
 ### Fixes
