@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.4 - 2026-10-15
+
+### Fixes
+
+- Require vpndetection 5.7.2: Retry-After, the key, the base URL and unreadable answers ([`5cade35`](https://github.com/vpndetection-io/sdk-python-flask/commit/5cade3560e8034e61ebb06246713d3cb31ed8abd))
+
 ## 2.1.3 - 2026-10-10
 
 ### Fixes
