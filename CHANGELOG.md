@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.5 - 2026-10-16
+
+### Fixes
+
+- Require vpndetection 5.7.3: the spec re-pinned to 2026.10.15 ([`1df70b0`](https://github.com/vpndetection-io/sdk-python-flask/commit/1df70b008137578382f1ceca8b993be2725c9361))
+
 ## 2.1.4 - 2026-10-15
 
 ### Fixes
