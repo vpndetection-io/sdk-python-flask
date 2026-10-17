@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.6 - 2026-10-17
+
+### Features
+
+- Require vpndetection 5.8.0: OauthMetadata carries registration_endpoint ([`f2af483`](https://github.com/vpndetection-io/sdk-python-flask/commit/f2af483eb0610fbfe43b1cae501fb5945636ebc7))
+
 ## 2.1.5 - 2026-10-16
 
 ### Fixes
