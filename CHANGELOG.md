@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.7 - 2026-10-18
+
+### Fixes
+
+- Require vpndetection 5.9.0: is_pubproxy and the pubproxy detail ([`bcf1c47`](https://github.com/vpndetection-io/sdk-python-flask/commit/bcf1c474af70b513d339f6dfec6a8d33d05d3ce6))
+
 ## 2.1.6 - 2026-10-17
 
 ### Features
