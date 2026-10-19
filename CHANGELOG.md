@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.8 - 2026-10-19
+
+### Fixes
+
+- Require vpndetection 5.10.0: num_ports and num_proxies in the pubproxy detail ([`c7ced24`](https://github.com/vpndetection-io/sdk-python-flask/commit/c7ced2429460f978dea05ee374919b9b8eafa2a8))
+
 ## 2.1.7 - 2026-10-18
 
 ### Fixes
