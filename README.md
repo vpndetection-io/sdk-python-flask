@@ -15,7 +15,7 @@ pip install vpndetection-flask
 
 Requires Python 3.11 or newer.
 
-You need an API key. Create one in the [console](https://app.vpndetection.io); the free tier's allowance is counted per source address, and a server is a single source address, so a key is what makes this usable in production rather than optional.
+You need an API key. Create one in the [console](https://app.vpndetection.io); without one the allowance is counted per source address, and a server is a single source address, so a key is what makes this usable in production rather than optional.
 
 ```python
 from flask import Flask
@@ -115,7 +115,7 @@ Beyond a few million distinct visitors a day, stop calling the API per request: 
 
 ## Absent is not false
 
-Only `ip` and `is_vpn` come back on every plan. A field your plan does not include is `None`, which means "not in your plan" rather than "checked, and no".
+Without a key only `ip` and `is_vpn` come back, and a free key adds Tor, relay, `location` and `asn`. A field your plan does not include is `None`, which means "not in your plan" rather than "checked, and no".
 
 ```python
 lookup().result.is_hosting  # None when your plan does not include it
