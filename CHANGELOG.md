@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.11 - 2026-10-23
+
+### Fixes
+
+- Require vpndetection 5.12.0, which adds oauth.register ([`f884727`](https://github.com/vpndetection-io/sdk-python-flask/commit/f8847278743b8c2740f5e53ff4dea016e588d08c))
+
 ## 2.1.10 - 2026-10-22
 
 ### Fixes
