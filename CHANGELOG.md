@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.14 - 2026-10-28
+
+### Fixes
+
+- Require vpndetection 5.12.3: a date-time whose T or Z is lowercase is read ([`1a0b641`](https://github.com/vpndetection-io/sdk-python-flask/commit/1a0b6417a903bb88dd022b1b5258506a34a6376a))
+
 ## 2.1.13 - 2026-10-26
 
 ### Fixes
