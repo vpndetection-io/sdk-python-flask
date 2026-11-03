@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/vpndetection-flask.svg)](https://pypi.org/project/vpndetection-flask/)
 [![license](https://img.shields.io/pypi/l/vpndetection-flask.svg)](LICENSE)
 
-The official Flask Extension for the [VPNDetection](https://vpndetection.io) API.
+The official Flask extension for the [VPNDetection](https://vpndetection.io) API.
 
 It classifies the visitor behind each request — VPN, residential proxy, Tor, hosting, CDN, relay — and hands the answer to your code. Blocking is opt-in.
 
