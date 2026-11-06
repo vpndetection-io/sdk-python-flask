@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.15 - 2026-11-06
+
+### Fixes
+
+- Require vpndetection 5.12.4: a device poll ends at its deadline ([`e91fb2d`](https://github.com/vpndetection-io/sdk-python-flask/commit/e91fb2dfe60b6716ff30b010d10757ea0c57f705))
+
 ## 2.1.14 - 2026-10-28
 
 ### Fixes
