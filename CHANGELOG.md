@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.18 - 2026-11-11
+
+### Features
+
+- Require vpndetection 5.14.0: a lookup without a key answers more ([`b66ab04`](https://github.com/vpndetection-io/sdk-python-flask/commit/b66ab04d2f0d1833f4510eec9762634643f302c8))
+
 ## 2.1.17 - 2026-11-11
 
 ### Fixes
