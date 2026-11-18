@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.26 - 2026-11-18
+
+### Fixes
+
+- Require vpndetection 5.18.0: cap_reached past a paid plan's overage cap ([`679e8b5`](https://github.com/vpndetection-io/sdk-python-flask/commit/679e8b53bb2c892b6caf14a63fe6ca1f1d95ed17))
+
 ## 2.1.25 - 2026-11-17
 
 ### Fixes
