@@ -3,9 +3,9 @@
 [![PyPI](https://img.shields.io/pypi/v/vpndetection-flask.svg)](https://pypi.org/project/vpndetection-flask/)
 [![license](https://img.shields.io/pypi/l/vpndetection-flask.svg)](LICENSE)
 
-The official Flask extension for the [VPNDetection](https://vpndetection.io) API.
+The official Flask extension for the [VPNDetection](https://vpndetection.io) API: it checks each visitor's IP for VPN, Tor and proxy use, and can block them with a 403.
 
-It classifies the visitor behind each request — VPN, residential proxy, Tor, hosting, CDN, relay — and hands the answer to your code. Blocking is opt-in.
+It classifies the visitor behind each request: VPN, residential proxy, Tor, hosting, CDN or relay. Then it hands the answer to your code. Blocking is opt-in.
 
 ## Getting Started
 
@@ -15,7 +15,7 @@ pip install vpndetection-flask
 
 Requires Python 3.11 or newer.
 
-You need an API key on a paid plan. Create one in the [console](https://app.vpndetection.io); without one a lookup is on Unlimited, the free plan, and leaves out the hosting, CDN and proxy flags, so a paid plan is what makes this usable in production rather than optional. A free account tries every field.
+No API key needed to start. Without one, a lookup is on Unlimited, the free plan, which answers VPN, Tor and relay detection with no daily or monthly cap. A paid plan's key adds the hosting, CDN and proxy flags and the provider behind each flag: create one in the [console](https://app.vpndetection.io). A free account tries every field.
 
 ```python
 from flask import Flask
@@ -39,7 +39,7 @@ def index():
 
 A request your `skip` claims gets no answer, and `lookup()` is `None` for it.
 
-By default nothing is blocked. Every request gets an answer and your own code decides what that means — which is usually what you want, because whether a VPN visitor is a problem depends entirely on what they are doing.
+By default nothing is blocked. Every request gets an answer and your own code decides what to do with it, since whether a VPN visitor is a problem depends on what they're doing.
 
 ## Blocking
 
@@ -79,7 +79,7 @@ def checkout(): ...
 
 ## Where the client address comes from
 
-This is the setting that decides whether any of the above works, and it is the one thing only you can get right.
+Get this setting right, or none of the above works.
 
 By default the extension uses `request.remote_addr`, which is the socket peer unless you have wrapped the app in werkzeug's `ProxyFix`. Behind a load balancer without it, every visitor looks like the load balancer, and that is the address that gets checked: VPN visitors pass unnoticed, and if it is a hosting address, a hosting rule blocks everyone. A load balancer in your own network usually has a private address, which the extension answers locally without a lookup, flagging nobody and logging a warning. Adding `ProxyFix` is Flask's own answer and everything else here follows from it. It counts proxies from the right (`x_for=1` believes the last `X-Forwarded-For` entry), so it is right only when the app cannot be reached except through those proxies: anyone who connects to the app directly writes that entry themselves.
 
@@ -91,7 +91,7 @@ from vpndetection_flask import header_ip_selector
 ip_selector = header_ip_selector("CF-Connecting-IP")  # or True-Client-IP, or your own
 ```
 
-`xff_ip_selector()` reads `X-Forwarded-For` directly. Be aware that the left-most entry is whatever the caller sent, because proxies append to that header — it is only trustworthy when an edge you control overwrites it. If you know how many proxies sit in front, count from the right instead: `xff_ip_selector(1)` is the address your nearest proxy saw.
+`xff_ip_selector()` reads `X-Forwarded-For` directly. The left-most entry is whatever the caller sent, since proxies append to that header, so trust it only when an edge you control overwrites it. If you know how many proxies sit in front, count from the right instead: `xff_ip_selector(1)` is the address your nearest proxy saw.
 
 Anything else, pass your own callable. It receives the request and returns an address.
 
@@ -103,7 +103,7 @@ The request is let through, and the reason is recorded on the answer's `error`. 
 
 ## Cost and latency
 
-Answers are cached for an hour, so a returning visitor costs nothing, and private addresses never leave the process. A cache miss is one request to our API, bounded at 2.5 seconds by default and not retried — on a request path, failing open quickly beats holding a visitor while we try again. Both are adjustable, as is the cache, through a `vpndetection` client you build yourself and pass as `client`.
+Answers are cached for an hour, so a returning visitor costs nothing, and private addresses never leave the process. A cache miss is one request to our API, bounded at 2.5 seconds by default and not retried: on a request path, failing open fast beats holding a visitor while we retry. Both are adjustable, as is the cache, through a `vpndetection` client you build yourself and pass as `client`.
 
 Skip what you do not care about:
 
@@ -115,7 +115,7 @@ Beyond a few million distinct visitors a day, stop calling the API per request: 
 
 ## Absent is not false
 
-Unlimited, with a key or without one, leaves out `is_hosting`, `is_cdn` and the four proxy flags, and of the detail behind each flag it answers only Tor's and relay's. A field your plan does not include is `None`, which means "not in your plan" rather than "checked, and no".
+Unlimited, with a key or without one, leaves out `is_hosting`, `is_cdn`, the four proxy flags, the carrier, satellite and service flags, `company` and `abuse`, and of the detail behind each flag it answers only Tor's and relay's. A field your plan does not include is `None`, which means "not in your plan" rather than "checked, and no".
 
 ```python
 lookup().result.is_hosting  # None when your plan does not include it
