@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.1.29 - 2026-11-22
+
+### Features
+
+- Require vpndetection 5.20.0: is_bot and bot, and the AS's country and RPKI status required ([`20a94e0`](https://github.com/vpndetection-io/sdk-python-flask/commit/20a94e062c87aa7aaf8fe53ccc137c2f77434e53))
+
 ## 2.1.28 - 2026-11-20
 
 ### Features
