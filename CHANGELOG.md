@@ -2,6 +2,13 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.2.0 - 2026-11-23
+
+### Features
+
+- Require vpndetection 5.21.0: a user agent with a lookup, and allow_bots in the middleware core ([`331cd9b`](https://github.com/vpndetection-io/sdk-python-flask/commit/331cd9bca18bbdec3c4c2908034f480cbdc57354))
+- Let a verified crawler through with allow_bots ([`16edaf0`](https://github.com/vpndetection-io/sdk-python-flask/commit/16edaf09216a738fa015bc818ec18d524b9f40e9))
+
 ## 2.1.29 - 2026-11-22
 
 ### Features
