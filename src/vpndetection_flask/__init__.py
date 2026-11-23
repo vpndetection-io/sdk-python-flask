@@ -162,6 +162,8 @@ class VPNDetection:
     """Classify the visitor, and optionally refuse the request.
 
     Takes everything :class:`vpndetection.middleware.Options` does, plus ``on_blocked``.
+    ``allow_bots=True`` sends the request's own ``User-Agent`` with its lookup and never
+    refuses a crawler the answer verifies, here or in :func:`block_if`.
 
     Without a ``block_condition`` this only enriches the request and never refuses one,
     leaving the decision to your own views. A lookup that fails - network, quota, an
@@ -177,7 +179,9 @@ class VPNDetection:
         **options: Any,
     ) -> None:
         self._on_blocked = on_blocked or _refuse
-        self._core: Core[WerkzeugRequest] = Core(Options(**options), default_ip_selector)
+        self._core: Core[WerkzeugRequest] = Core(
+            Options(**options), default_ip_selector, _user_agent
+        )
         if app is not None:
             self.init_app(app)
 
@@ -196,6 +200,10 @@ class VPNDetection:
             # running; merely building one would let the request through.
             return self._on_blocked(found)
         return None
+
+
+def _user_agent(req: WerkzeugRequest) -> str | None:
+    return req.headers.get("User-Agent")
 
 
 def _refuse(_lookup: Lookup) -> Response:
