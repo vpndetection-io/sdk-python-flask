@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.2.2 - 2026-11-24
+
+### Fixes
+
+- Require vpndetection 5.22.0: a condition on a list member, such as pubproxy.protocols or a web row's port, matches any element ([`a5e5c5e`](https://github.com/vpndetection-io/sdk-python-flask/commit/a5e5c5e0d20fcbd7635c8cb1f148a59b6e8f0c06))
+
 ## 2.2.1 - 2026-11-24
 
 ### Fixes
