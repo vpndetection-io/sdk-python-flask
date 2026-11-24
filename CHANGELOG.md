@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.2.1 - 2026-11-24
+
+### Fixes
+
+- Require vpndetection 5.21.1: a detail's first_seen or last_seen that is not a day is refused ([`60a2fe9`](https://github.com/vpndetection-io/sdk-python-flask/commit/60a2fe9665694e49050cfe488d89aa4f6d8a22b8))
+
 ## 2.2.0 - 2026-11-23
 
 ### Features
