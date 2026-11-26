@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.2.5 - 2026-11-26
+
+### Fixes
+
+- Require vpndetection 5.23.1: a condition on the verdict is no plan gap for a request that sent no agent ([`da5a188`](https://github.com/vpndetection-io/sdk-python-flask/commit/da5a1880725a54125851d3fd9696ec9b6d3720e6))
+
 ## 2.2.4 - 2026-11-26
 
 ### Features
