@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.2.4 - 2026-11-26
+
+### Features
+
+- Require vpndetection 5.23.0: allowBots sends only a crawler's User-Agent, at most four an address ([`a6f1723`](https://github.com/vpndetection-io/sdk-python-flask/commit/a6f1723e92bebe4f48a3f7b35c24ea2c5c9f1d4f))
+
 ## 2.2.3 - 2026-11-25
 
 ### Fixes
