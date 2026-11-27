@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 2.0.5 are described by their release commits.
 
+## 2.2.6 - 2026-11-27
+
+### Features
+
+- Require vpndetection 5.24.0: a keyless answer without the AS's type reads ([`cf3ee60`](https://github.com/vpndetection-io/sdk-python-flask/commit/cf3ee607eacf08cb22c9b6da55ca84a39c36dfd9))
+
 ## 2.2.5 - 2026-11-26
 
 ### Fixes
